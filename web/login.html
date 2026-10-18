@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log in</title>
+</head>
+<body>
+    <h1>Log in</h1>
+
+    <form id="login-form" method="post" action="/api/login">
+        <p>
+            <label for="username">Username</label>
+            <input
+                id="username"
+                name="username"
+                type="text"
+                autocomplete="username"
+                required
+            >
+        </p>
+
+        <p>
+            <label for="password">Password</label>
+            <input
+                id="password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                required
+            >
+        </p>
+
+        <button type="submit" id="login-button">Log in</button>
+    </form>
+
+    <p id="message" role="status"></p>
+
+    <p>Don't have an account?</p>
+
+    <button
+        type="button"
+        onclick="window.location.href = '/register.html'"
+    >
+        Click here to register
+    </button>
+
+    <dialog id="login-error" aria-labelledby="error-title">
+        <button
+            type="button"
+            id="close-error"
+            aria-label="Close"
+            autofocus
+        >
+            ×
+        </button>
+
+        <h2 id="error-title">Unable to log in</h2>
+        <p>Username or password is incorrect.</p>
+        <p>Don't have an account?</p>
+
+        <button
+            type="button"
+            onclick="window.location.href = '/register.html'"
+        >
+            Click here to register
+        </button>
+    </dialog>
+
+    <script>
+        const form = document.getElementById("login-form");
+        const message = document.getElementById("message");
+        const button = document.getElementById("login-button");
+        const errorDialog = document.getElementById("login-error");
+        const closeError = document.getElementById("close-error");
+
+        closeError.addEventListener("click", function () {
+            errorDialog.close();
+        });
+
+        form.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            button.disabled = true;
+            message.textContent = "Logging in...";
+
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            try {
+                sessionStorage.removeItem("token");
+
+                const response = await fetch("/api/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+
+                if (response.status === 401) {
+                    message.textContent = "";
+                    errorDialog.showModal();
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    message.textContent =
+                        "Login is unavailable. Please try again.";
+                    return;
+                }
+
+                if (typeof data.token !== "string" || !data.token) {
+                    message.textContent =
+                        "The server did not return a login token.";
+                    return;
+                }
+
+                sessionStorage.setItem("token", data.token);
+                window.location.replace("/profile.html");
+            } catch (error) {
+                message.textContent =
+                    "Could not complete login. Please try again.";
+                console.error(error);
+            } finally {
+                button.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

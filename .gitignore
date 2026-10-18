@@ -1,0 +1,19 @@
+# Compiled executables
+*.exe
+/go-gin-jwt-server
+/go-gin-jwt-server.*
+
+# Secrets and local environment files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Logs
+*.log
+
+# Temporary HTML download folders
+/web-from-server/
+/web-from-server-retry/
+/web-download/

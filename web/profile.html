@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My profile</title>
+</head>
+<body>
+    <h1>My profile</h1>
+
+    <p id="status-message" role="status">Loading your information...</p>
+
+    <section id="profile-data" hidden>
+        <p>Your user ID: <span id="user-id"></span></p>
+        <p>Username: <span id="profile-username"></span></p>
+        <p>Registered on: <span id="profile-created-at"></span></p>
+        <p id="api-message"></p>
+    </section>
+
+    <button type="button" id="logout-button">Log out</button>
+
+    <script>
+        const statusMessage = document.getElementById("status-message");
+        const profileData = document.getElementById("profile-data");
+        const logoutButton = document.getElementById("logout-button");
+
+        function logout() {
+            sessionStorage.removeItem("token");
+            window.location.replace("/login");
+        }
+
+        logoutButton.addEventListener("click", logout);
+
+        async function loadProfile() {
+            profileData.hidden = true;
+
+            const token = sessionStorage.getItem("token");
+
+            if (!token) {
+                window.location.replace("/login");
+                return;
+            }
+
+            statusMessage.textContent = "Loading your information...";
+
+            try {
+                const response = await fetch("/api/user/info", {
+                    method: "GET",
+                    headers: {
+                        Authorization: "Bearer " + token
+                    },
+                    cache: "no-store"
+                });
+
+                if (response.status === 401) {
+                    logout();
+                    return;
+                }
+
+                if (!response.ok) {
+                    statusMessage.textContent =
+                        "Unable to load your information. Please refresh to retry.";
+                    return;
+                }
+
+                const data = await response.json();
+
+                document.getElementById("user-id").textContent = data.userId;
+
+                document.getElementById("profile-username").textContent =
+                    data.username;
+
+                document.getElementById("profile-created-at").textContent =
+                    new Date(data.createdAt).toLocaleString();
+
+                document.getElementById("api-message").textContent = data.msg;
+
+                profileData.hidden = false;
+                statusMessage.textContent = "";
+            } catch (error) {
+                statusMessage.textContent =
+                    "Could not load your information. Check the connection and refresh.";
+                console.error(error);
+            }
+        }
+
+        window.addEventListener("pageshow", loadProfile);
+    </script>
+</body>
+</html>

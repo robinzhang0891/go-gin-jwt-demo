@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+</head>
+<body>
+    <h1>Create an account</h1>
+
+    <form id="register-form" method="post" action="/api/register">
+        <p>
+            <label for="username">Username</label>
+            <input
+                id="username"
+                name="username"
+                type="text"
+                autocomplete="username"
+                required
+            >
+        </p>
+
+        <p>
+            <label for="password">Password</label>
+            <input
+                id="password"
+                name="password"
+                type="password"
+                autocomplete="new-password"
+                required
+            >
+        </p>
+
+        <button type="submit" id="register-button">Register</button>
+    </form>
+
+    <p id="message" role="status"></p>
+
+    <p id="login-link" hidden>
+        <a href="/login.html">Account created. Click here to log in.</a>
+    </p>
+
+    <script>
+        const form = document.getElementById("register-form");
+        const message = document.getElementById("message");
+        const loginLink = document.getElementById("login-link");
+        const button = document.getElementById("register-button");
+
+        form.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            button.disabled = true;
+            message.textContent = "Registering...";
+            loginLink.hidden = true;
+
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            try {
+                const response = await fetch("/api/register", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    message.textContent = data.msg || "Registration failed.";
+                    return;
+                }
+
+                message.textContent = "Registration successful.";
+                loginLink.hidden = false;
+                form.reset();
+            } catch (error) {
+                message.textContent =
+                    "Could not complete registration. Check the server and try again.";
+                console.error(error);
+            } finally {
+                button.disabled = false;
+            }
+        });
+    </script>
+
+</body>
+</html>
