@@ -2,6 +2,7 @@
 *.exe
 /go-gin-jwt-server
 /go-gin-jwt-server.*
+/go-gin-jwt-server-*
 
 # Secrets and local environment files
 .env
@@ -9,11 +10,7 @@
 !.env.example
 *.pem
 *.key
+/config.yaml #actual setting used
 
 # Logs
 *.log
-
-# Temporary HTML download folders
-/web-from-server/
-/web-from-server-retry/
-/web-download/
