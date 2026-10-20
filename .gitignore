@@ -10,7 +10,7 @@
 !.env.example
 *.pem
 *.key
-/config.yaml #actual setting used
+/config.yaml
 
 # Logs
 *.log

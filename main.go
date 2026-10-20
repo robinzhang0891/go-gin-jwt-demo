@@ -19,7 +19,7 @@ func main() {
 	// 初始化数据库连接
 	config.InitDB()
 	// 自动迁移建表（可选，不用手动执行SQL）
-	err := config.DB.AutoMigrate(&model.User{})
+	err := config.DB.AutoMigrate(&model.User{}, &model.Voice{})
 	if err != nil {
 		panic("数据表迁移失败：" + err.Error())
 	}
