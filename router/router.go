@@ -39,6 +39,7 @@ func SetupRouter() *gin.Engine {
 	{
 		public.POST("/register", controller.Register)
 		public.POST("/login", controller.Login)
+		public.GET("/voices", controller.ListVoices)
 	}
 
 	// 需要JWT鉴权的私有路由组
